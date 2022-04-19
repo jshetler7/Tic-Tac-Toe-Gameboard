@@ -1,85 +1,63 @@
 let cells = document.querySelectorAll('.row > div');
-let counter = 0;
+const Gondor = 'Gondor.png';
+const Mordor = 'Mordor.jpg';
+let clickCount = 0;
+let currentPlayer = Gondor;
 
-for(let i = 0; i < cells.length; i++) {
-    cells[i].addEventListener('click', cellClicked);
+for(const cell of cells) {
+    cell.addEventListener('click', cellClicked);
 }
 
-
-
-function cellClicked(Event) {
-    if(counter % 2 == 0) {
-        Event.srcElement.textContent = 'X';
+function cellClicked(evt) {
+    //Easy Anti-Cheat from Wish.com
+    if (evt.target.src === Gondor || evt.target.src === Mordor) {
+        return;
     }
-    else {
-        Event.srcElement.textContent = 'O';
-    }
-    checkWinner(counter);
-    counter++
-}
 
-let check = ' ';
-function checkWinner(counters) {
-    if(counter % 2 == 0) {
-        check = 'X';
+    //Determine the poor sod whose turn it is
+    evt.target.src = currentPlayer;
+
+    //increment move count
+    clickCount++;
+
+    //check for a winner
+    if(
+        checkCombo(0, 1, 2) ||
+        checkCombo(3, 4, 5) ||
+        checkCombo(6, 7, 8) ||
+        checkCombo(0, 3, 6) ||
+        checkCombo(1, 4, 7) ||
+        checkCombo(2, 5, 8) ||
+        checkCombo(0, 4, 8) ||
+        checkCombo(6, 4, 2)
+    ) {
+        console.log(currentPlayer + ' wins!');
+        alert(currentPlayer.substring(0, 6) + ' wins!');
+        return;
+    }
+
+    if(clickCount === 9) {
+        console.log("It's a draw.");
+        alert("The war rages on.");
+        return;
+    }
+
+    //Cycle through the poor sods / currentPlayer
+    if(currentPlayer === Gondor) {
+        currentPlayer = Mordor;
     } else {
-        check = 'O';
+        currentPlayer = Gondor;
     }
-
-        //checks rows for winner
-        if(cells[0].textContent == check && cells[1].textContent == check && cells[2].textContent == check) {
-            console.log(check + ' Wins!!!!')
-            return
-        }
-        if(cells[3].textContent == check && cells[4].textContent == check && cells[5].textContent == check) {
-            console.log(check + ' Wins!!!!')
-            return
-        }
-        if(cells[6].textContent == check && cells[7].textContent == check && cells[8].textContent == check) {
-            console.log(check + ' Wins!!!!')
-            return
-        }
-
-        //checks columns for winner
-        if(cells[0].textContent == check && cells[3].textContent == check && cells[6].textContent == check) {
-            console.log(check + ' Wins!!!!')
-            return
-        }
-        if(cells[1].textContent == check && cells[4].textContent == check && cells[7].textContent == check) {
-            console.log(check + ' Wins!!!!')
-            return
-        }
-        if(cells[2].textContent == check && cells[5].textContent == check && cells[8].textContent == check) {
-            console.log(check + ' Wins!!!!')
-            return
-        }
-
-        //checks diagonals for winner
-        if(cells[0].textContent == check && cells[4].textContent == check && cells[8].textContent == check) {
-            console.log(check + ' Wins!!!!')
-            return
-        }
-        if(cells[2].textContent == check && cells[4].textContent == check && cells[6].textContent == check) {
-            console.log(check + ' Wins!!!!')
-            return
-        }
-
-        // check for draw
-        if (counter === 8) {
-            console.log('Draw');
-            return
-        }
-    
 }
 
-// function addClassToImage(element){
-//     var innerImage = element.querySelector('img');
-//     if(innerImage) {
-//         if(innerImage.classList.contains('clicked')) {
-//             innerImage.classList.remove('clicked');
-//         }
-//         else {
-//             innerImage.classList.add('clicked')
-//         }
-//     }
-// }
+function checkCombo(a, b, c) {
+    if (
+        cells[a].children[0].src.endsWith(currentPlayer) && 
+        cells[b].children[0].src.endsWith(currentPlayer) && 
+        cells[c].children[0].src.endsWith(currentPlayer)
+    ) {
+        return true;
+    } else {
+        return false;
+    }
+}
